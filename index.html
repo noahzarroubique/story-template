@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Copy HTML to Clipboard</title>
+  <style>
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      border-radius: 8px;
+      color: white;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      z-index: 1000;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .toast.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    .toast.success {
+      background-color: #4caf50;
+    }
+    
+    .toast.error {
+      background-color: #f44336;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: Arial, sans-serif;
+      cursor: pointer;
+      user-select: none;
+    }
+    
+    .click-area {
+      text-align: center;
+      color: white;
+      font-size: 2rem;
+      font-weight: 300;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s ease;
+    }
+    
+    .click-area:hover {
+      transform: scale(1.05);
+    }
+    
+    .click-area:active {
+      transform: scale(0.95);
+    }
+  </style>
+</head>
+<body onclick="copyHtml()">
+
+<!-- Hidden formatted HTML content -->
+<div id="copy-content" style="display:none;">
+  <h2>Kurzbeschrieb / Kontext:</h2>
+  <p>Story beschrieb</p>
+  <h3>Relevante AKs</h3>
+  <ul><li>…</li></ul>
+  <h3>Out of Scope</h3>
+  <ul><li>…</li></ul>
+  <h3>Ressourcen</h3>
+  <ul><li>Figma Screens</li><li>…</li></ul>
+  <h3>Backend Schnittstelle</h3>
+  <ul><li>Verlinkung zum yaml</li></ul>
+  <h3>Test-Ressourcen</h3>
+  <ul><li>Wie können wir es während der Entwicklung ausprobieren?</li></ul>
+  <h2>Fragen</h2>
+  <table border="1" cellpadding="4" cellspacing="0">
+    <thead><tr><th>Datum</th><th>Frage</th><th>Antwort</th></tr></thead>
+    <tbody><tr><td></td><td></td><td></td></tr></tbody>
+  </table>
+</div>
+
+<!-- Centered click text -->
+<div class="click-area">
+  Click to copy template
+</div>
+
+<script>
+  function showToast(message, type = 'success') {
+    // Remove any existing toast
+    const existingToast = document.querySelector('.toast');
+    if (existingToast) {
+      existingToast.remove();
+    }
+    
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    
+    // Add to page
+    document.body.appendChild(toast);
+    
+    // Show toast with animation
+    setTimeout(() => {
+      toast.classList.add('show');
+    }, 10);
+    
+    // Hide and remove toast after 3 seconds
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.parentNode.removeChild(toast);
+        }
+      }, 300);
+    }, 3000);
+  }
+
+  async function copyHtml() {
+    const htmlContent = document.getElementById("copy-content").innerHTML;
+    try {
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          "text/html": new Blob([htmlContent], { type: "text/html" })
+        })
+      ]);
+      showToast("📋Musterstory in Zwischenablage kopiert", "success");
+    } catch (err) {
+      showToast("❌ Copy failed: " + err.message, "error");
+    }
+  }
+</script>
+
+</body>
+</html>
